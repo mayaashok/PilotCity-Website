@@ -10,21 +10,13 @@
                     <label for="author">Author:</label>
                     <input type="text" name="author" v-model="post.author">
                 </div>
-                <div class="field date">
+                <!-- <div class="field date">
                     <label for="date">Date:</label>
                     <input type="date" name="date" v-model="post.date">
                 </div>
                 <div class="field time">
                     <label for="time">Time:</label>
                     <input type="time" name="time" v-model="post.time">
-                </div>
-                <!-- <div class="field date">
-                    <label for="date">Date of Post:</label>
-                    <input type="text" name="date" v-model="post.date" >
-                </div>
-                <div class="field time">
-                    <label for="time">Time of Post:</label>
-                    <input type="text" name="time" v-model="post.time">
                 </div> -->
                 <div class="field message">
                     <label for="message">Message:</label>
@@ -59,6 +51,9 @@ export default {
     EditPost() {
       if (this.post.subject) {
         this.feedback = null;
+        const today = new Date();
+        this.post.date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+        this.post.time = `${today.getHours()}:${today.getMinutes()}`;
         // create a slug
         this.post.slug = slugify(this.post.subject, {
           replacement: '-',

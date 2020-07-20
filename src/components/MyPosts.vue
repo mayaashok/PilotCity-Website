@@ -73,7 +73,7 @@ export default {
   methods: {
     deletePost(id) {
       // delete doc from firestore
-      db.collection('myPosts').doc(id).delete()
+      db.collection('posts').doc(id).delete()
         .then(() => {
           this.myPosts = this.myPosts.filter((myPost) => myPost.id !== id);
         });

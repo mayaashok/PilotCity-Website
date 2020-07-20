@@ -28,7 +28,7 @@
         <div class="blog container">
             <div class="card" v-for="post in filteredPosts" :key="post.id">
                 <div class="card-content">
-                    <h3><br>{{ post.author }}: {{ post.subject }}</h3>
+                    <h3><br>{{ post.alias }}: {{ post.subject }}</h3>
                     <!-- <h4>{{ post.time }}<br>{{ post.date }}</h4> -->
                     <h4>{{ formatTime(post.time) }}<br>{{ formatDate(post.date) }}</h4>
                     <!-- <h4>{{ post.date.toDate().toString()}}</h4> -->

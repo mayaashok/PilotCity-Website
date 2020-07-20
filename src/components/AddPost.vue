@@ -6,25 +6,17 @@
                     <label for="subject">Subject:</label>
                     <input type="text" name="subject" v-model="subject">
                 </div>
-                <div class="field author">
+                <!-- <div class="field author">
                     <label for="author">Author:</label>
                     <input type="text" name="author" v-model="author">
-                </div>
-                <div class="field date">
+                </div> -->
+                <!-- <div class="field date">
                     <label for="date">Date:</label>
                     <input type="date" name="date" v-model="date">
                 </div>
                 <div class="field time">
                     <label for="time">Time:</label>
                     <input type="time" name="time" v-model="time">
-                </div>
-                <!-- <div class="field date">
-                    <label for="date">Date of Post:</label>
-                    <input placeholder="November 11, 2011" type="text" name="date" v-model="date">
-                </div>
-                <div class="field time">
-                    <label for="time">Time of Post:</label>
-                    <input placeholder="11:00 AM" type="text" name="time" v-model="time">
                 </div> -->
                 <div class="field message">
                     <label for="message">Message:</label>
@@ -54,19 +46,40 @@ export default {
   data() {
     return {
       subject: null,
-      author: null,
+      // author: null,
       date: null,
       time: null,
       message: null,
       feedback: null,
       slug: null,
       user_id: null,
+      alias: null,
     };
   },
   methods: {
+    getUserAlias() {
+      db.collection('users').where('user_id', '==', firebase.auth().currentUser.uid).get()
+        .then((snapshot) => {
+          snapshot.forEach((doc) => {
+            this.user = doc.data();
+            this.user.id = doc.id;
+          });
+          console.log('get current user id');
+          console.log(this.user.id);
+          console.log('this.user.alias =', this.user.alias);
+          this.alias = this.user.alias;
+          console.log('this.alias =', this.alias);
+          // return this.user.alias;
+        });
+    },
     AddPost() {
       if (this.subject) {
         this.feedback = null;
+        const today = new Date();
+        this.date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+        this.time = `${today.getHours()}:${today.getMinutes()}`;
+        this.getUserAlias();
+        console.log('this.alias =', this.alias);
         // create a slug
         this.slug = slugify(this.subject, {
           replacement: '-',
@@ -75,12 +88,13 @@ export default {
         });
         db.collection('posts').add({
           subject: this.subject,
-          author: this.author,
+          // author: this.author,
           date: this.date,
           time: this.time,
           message: this.message,
           slug: this.slug,
           user_id: firebase.auth().currentUser.uid,
+          alias: this.alias,
         }).then(() => {
           this.$router.push({ name: 'Blog' });
         }).catch((err) => {
