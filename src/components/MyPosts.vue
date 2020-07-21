@@ -25,11 +25,11 @@
           </v-list>
         </v-menu>
         <br/>
-        <h1 class="field center">My Blog Posts</h1>
+        <h1 class="field center">My Posts</h1>
         <div class="blog container">
             <div class="card" v-for="post in filteredPosts" :key="post.id">
                 <div class="card-content">
-                    <h3><br>{{ post.author }}: {{ post.subject }}</h3>
+                    <h3><br>{{ post.alias }}: {{ post.subject }}</h3>
                     <!-- <h4>{{ post.time }}<br>{{ post.date }}</h4> -->
                     <h4>{{ formatTime(post.time) }}<br>{{ formatDate(post.date) }}</h4>
                     <!-- <h4>{{ post.date.toDate().toString()}}</h4> -->
@@ -39,7 +39,8 @@
                         <i class="material-icons create">create</i>
                       </router-link>
                     </a>
-                    <i class="material-icons delete" @click="deletePost(post.id)">delete</i>
+                <!-- <i class="material-icons delete" @click="deletePost(post.id)">delete</i> -->
+                    <i class="material-icons delete" v-on:click="deletePost(post.id)">delete</i>
   <!-- <v-icon class="material-icons delete" @click="deletePost(post.id)">mdi-Delete</v-icon> -->
                 </div>
             </div>
@@ -72,11 +73,14 @@ export default {
   },
   methods: {
     deletePost(id) {
+      // eslint-disable-next-line no-alert, no-restricted-globals
+      if (confirm('Are you sure you want to delete this post?')) {
       // delete doc from firestore
-      db.collection('posts').doc(id).delete()
-        .then(() => {
-          this.myPosts = this.myPosts.filter((myPost) => myPost.id !== id);
-        });
+        db.collection('posts').doc(id).delete()
+          .then(() => {
+            this.myPosts = this.myPosts.filter((myPost) => myPost.id !== id);
+          });
+      }
     },
     formatTime(time24) {
       let ts = time24;
@@ -109,13 +113,13 @@ export default {
       return this.myPosts.filter((post) => post.message.toLowerCase().match(newSearchTerm)
         || this.formatDate(post.date).match(this.searchTerm)
         || post.subject.toLowerCase().match(newSearchTerm)
-        || post.author.toLowerCase().match(newSearchTerm)
+        || post.alias.toLowerCase().match(newSearchTerm)
         || this.formatTime(post.time).match(this.searchTerm));
     },
   },
   created() {
     // fetch data from firestore
-    db.collection('posts').get()
+    db.collection('posts').orderBy('date', 'desc').orderBy('time', 'desc').get()
       .then((snapshot) => {
         snapshot.forEach((doc) => {
           const post = doc.data();

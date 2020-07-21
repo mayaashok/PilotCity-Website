@@ -57,35 +57,20 @@ export default {
     };
   },
   methods: {
-    getUserAlias() {
-      db.collection('users').where('user_id', '==', firebase.auth().currentUser.uid).get()
-        .then((snapshot) => {
-          snapshot.forEach((doc) => {
-            this.user = doc.data();
-            this.user.id = doc.id;
-          });
-          console.log('get current user id');
-          console.log(this.user.id);
-          console.log('this.user.alias =', this.user.alias);
-          this.alias = this.user.alias;
-          console.log('this.alias =', this.alias);
-          // return this.user.alias;
-        });
-    },
     AddPost() {
+      console.log('where is this: addpost page', this.$route.params.alias);
       if (this.subject) {
         this.feedback = null;
         const today = new Date();
         this.date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
         this.time = `${today.getHours()}:${today.getMinutes()}`;
-        this.getUserAlias();
-        console.log('this.alias =', this.alias);
         // create a slug
         this.slug = slugify(this.subject, {
           replacement: '-',
           remove: /[$*_+~.()'"!\-:@]/g,
           lower: true,
         });
+        console.log('setting post field: ', this.$route.params.alias);
         db.collection('posts').add({
           subject: this.subject,
           // author: this.author,
@@ -94,7 +79,7 @@ export default {
           message: this.message,
           slug: this.slug,
           user_id: firebase.auth().currentUser.uid,
-          alias: this.alias,
+          alias: this.$route.params.alias,
         }).then(() => {
           this.$router.push({ name: 'Blog' });
         }).catch((err) => {

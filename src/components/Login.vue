@@ -48,9 +48,10 @@ export default {
                 console.log('get current user id');
                 console.log(this.user.id);
                 console.log(this.user.alias);
-                this.alias = this.user.alias;
+                // this.alias = this.user.alias;
+                console.log('before pushing to blog: ', this.alias);
+                this.$router.push({ name: 'Blog', params: { alias: this.user.alias } });
               });
-            this.$router.push({ name: 'Blog' });
           }).catch((err) => {
             this.feedback = err.message;
           });

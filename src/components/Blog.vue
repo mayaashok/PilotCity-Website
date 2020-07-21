@@ -43,7 +43,7 @@
             </div>
         </div>
         <a href="" class="btn-floating btn-large add">
-          <router-link :to="{ name: 'AddPost' }">
+          <router-link :to="{ name: 'AddPost',params: { alias: this.$route.params.alias } }">
             <i class="material-icons add">add</i>
           </router-link>
         </a>
@@ -106,13 +106,14 @@ export default {
       return this.posts.filter((post) => post.message.toLowerCase().match(newSearchTerm)
         || this.formatDate(post.date).match(this.searchTerm)
         || post.subject.toLowerCase().match(newSearchTerm)
-        || post.author.toLowerCase().match(newSearchTerm)
+        || post.alias.toLowerCase().match(newSearchTerm)
         || this.formatTime(post.time).match(this.searchTerm));
     },
   },
   created() {
     // fetch data from firestore
-    db.collection('posts').get()
+    console.log('where is this:blog page', this.$route.params.alias);
+    db.collection('posts').orderBy('date', 'desc').orderBy('time', 'desc').get()
       .then((snapshot) => {
         snapshot.forEach((doc) => {
           const post = doc.data();

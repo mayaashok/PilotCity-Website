@@ -6,10 +6,10 @@
                     <label for="subject">Subject:</label>
                     <input type="text" name="subject" v-model="post.subject">
                 </div>
-                <div class="field author">
+                <!-- <div class="field author">
                     <label for="author">Author:</label>
                     <input type="text" name="author" v-model="post.author">
-                </div>
+                </div> -->
                 <!-- <div class="field date">
                     <label for="date">Date:</label>
                     <input type="date" name="date" v-model="post.date">
@@ -27,7 +27,7 @@
             <div class="field center">
               <button class="btn-large">Save</button>
             </div>
-            <router-link :to="{ name: 'Blog' }">
+            <router-link :to="{ name: 'MyPosts' }">
               <i class="material-icons close">close</i>
             </router-link>
         <br/>
@@ -62,11 +62,12 @@ export default {
         });
         db.collection('posts').doc(this.post.id).update({
           subject: this.post.subject,
-          author: this.post.author,
+          // author: this.post.author,
           date: this.post.date,
           time: this.post.time,
           message: this.post.message,
           slug: this.post.slug,
+          alias: this.post.alias,
         }).then(() => {
           this.$router.push({ name: 'Blog' });
         })
