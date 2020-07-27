@@ -39,6 +39,30 @@
                       </router-link>
                     </a> -->
                 <!-- <i class="material-icons delete" @click="deletePost(post.id)">delete</i> -->
+                <div id="blog">
+                  <!-- <span class="emoji">&#128077;</span> -->
+  <v-btn class="like" text icon color="blue lighten-2" @click="incrementLikes(post); post.likes++">
+<v-badge bottom color="blue darken-1" :content="post.likes" :value="post.likes"
+style="bottom: 5px; left:5px">
+  <v-icon>mdi-thumb-up</v-icon>
+</v-badge>
+  </v-btn>
+<!--<v-badge color="blue darken-1" :content="likes" :value="likes" style="bottom:
+100px; left:755px">
+</v-badge> -->
+<!-- <button class="reactionButton" v-on:click="emoji++" v-on:dblclick="emoji--"> {{ emoji }}
+</button> -->
+                  <!-- <span class="emoji2"> &#128078;</span> -->
+  <v-btn class="dislike" text icon color="red lighten-2" @click="incrementDislikes(post);
+post.dislikes++">
+<v-badge bottom color="red darken-1" :content="post.dislikes" :value="post.dislikes"
+style="bottom: 5px; left:5px">
+  <v-icon>mdi-thumb-down</v-icon>
+</v-badge>
+  </v-btn>
+<!-- <button class="reactionButton2" v-on:click="emoji2(1)" v-on:dblclick="emoji2(-1)"> {{ emoji2 }}
+</button> -->
+                </div>
                 </div>
             </div>
         </div>
@@ -57,8 +81,12 @@ export default {
   name: 'Blog',
   data() {
     return {
+      // likes: 0,
+      // dislikes: 0,
+      // show: false,
+      // emoji: 0,
+      // emoji2: 0,
       posts: [
-
       ],
       searchTerm: '',
       items: [
@@ -68,6 +96,14 @@ export default {
     };
   },
   methods: {
+    // // eslint-disable-next-line vue/no-dupe-keys
+    // emoji(amount) {
+    //   this.emoji += amount;
+    // },
+    // // eslint-disable-next-line vue/no-dupe-keys
+    // emoji2(amount) {
+    //   this.emoji2 += amount;
+    // },
     deletePost(id) {
       // delete doc from firestore
       db.collection('posts').doc(id).delete()
@@ -95,6 +131,16 @@ export default {
       const day = splitDate[2];
 
       return `${month}/${day}/${year}`;
+    },
+    incrementLikes(post) {
+      db.collection('posts').doc(post.id).update({
+        likes: post.likes + 1,
+      });
+    },
+    incrementDislikes(post) {
+      db.collection('posts').doc(post.id).update({
+        dislikes: post.dislikes + 1,
+      });
     },
   },
   computed: {
@@ -190,6 +236,78 @@ p {
   margin-top:20px;
   margin-bottom:20px;
   width: 80%;
+}
+i.v-icon.notranslate.mdi.mdi-thumb-up.theme--light::before {
+   position:absolute;
+   bottom:-2px;
+   left:-7px;
+   font-size:25px;
+}
+button.like.v-btn.v-btn--flat.v-btn--icon.v-btn--round.theme--light.v-size--default {
+   position:absolute;
+   top:20px;
+   left:750px;
+   /* right:100px; */
+   /* bottom:20px;
+   left:730px; */
+   font-size:25px;
+}
+span.v-badge_badge.blue.darken-1{
+   position: absolute;
+   font-family: 'Raleway', sans-serif;
+   font-size:25px;
+}
+i.v-icon.notranslate.mdi.mdi-thumb-down.theme--light::before {
+  position:absolute;
+   bottom:-3px;
+   left:-7px;
+   font-size:25px;
+}
+button.dislike.v-btn.v-btn--flat.v-btn--icon.v-btn--round.theme--light.v-size--default {
+   position:absolute;
+   top:20px;
+   left:820px;
+   font-size:25px;
+}
+span.v-badge_badge.red.darken-1{
+   position: absolute;
+   font-family: 'Raleway', sans-serif;
+   font-size:25px;
+}
+/* .emoji{
+   position:absolute;
+   bottom:30px;
+   right:55px;
+   font-size:25px;
+}
+.emoji2{
+  position:absolute;
+  bottom:30px;
+  right:10px;
+  font-size:25px;
+}
+.reactionButton{
+   position:absolute;
+   bottom:10px;
+   right:55px;
+   font-size:20px;
+   color:black;
+}
+.reactionButton2{
+   position:absolute;
+   bottom:10px;
+   right:10px;
+   font-size:20px;
+   color:black;
+} */
+.emojiBackground{
+background-color:#eeeeee;
+font-weight:bold;
+color:black;
+border:thin Black;
+border-style:dashed;
+line-height:20px;
+position:absolute;
 }
 /* .btn-floating {
     background-color: #C4C4C4;
