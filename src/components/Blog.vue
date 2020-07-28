@@ -300,7 +300,7 @@ span.v-badge_badge.red.darken-1{
    font-size:20px;
    color:black;
 } */
-.emojiBackground{
+/* .emojiBackground{
 background-color:#eeeeee;
 font-weight:bold;
 color:black;
@@ -308,7 +308,7 @@ border:thin Black;
 border-style:dashed;
 line-height:20px;
 position:absolute;
-}
+} */
 /* .btn-floating {
     background-color: #C4C4C4;
 } */
