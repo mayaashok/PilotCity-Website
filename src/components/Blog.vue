@@ -41,7 +41,8 @@
                 <!-- <i class="material-icons delete" @click="deletePost(post.id)">delete</i> -->
                 <div id="blog">
                   <!-- <span class="emoji">&#128077;</span> -->
-  <v-btn class="like" text icon color="blue lighten-2" @click="incrementLikes(post); post.likes++">
+  <v-btn class="like" text icon color="blue lighten-2" @click="incrementLikes(post); post.likes++"
+  style="top: 20px; left:750px">
 <v-badge bottom color="blue darken-1" :content="post.likes" :value="post.likes"
 style="bottom: 5px; left:5px">
   <v-icon>mdi-thumb-up</v-icon>
@@ -54,7 +55,7 @@ style="bottom: 5px; left:5px">
 </button> -->
                   <!-- <span class="emoji2"> &#128078;</span> -->
   <v-btn class="dislike" text icon color="red lighten-2" @click="incrementDislikes(post);
-post.dislikes++">
+post.dislikes++" style="top: 20px; left:810px">
 <v-badge bottom color="red darken-1" :content="post.dislikes" :value="post.dislikes"
 style="bottom: 5px; left:5px">
   <v-icon>mdi-thumb-down</v-icon>
@@ -62,6 +63,13 @@ style="bottom: 5px; left:5px">
   </v-btn>
 <!-- <button class="reactionButton2" v-on:click="emoji2(1)" v-on:dblclick="emoji2(-1)"> {{ emoji2 }}
 </button> -->
+<!-- <v-btn class="hearts" text icon color="pink lighten-2" @click="incrementHearts(post);
+post.hearts++" style="top: 20px; left:690px">
+<v-badge bottom color="pink darken-1" :content="post.hearts" :value="post.hearts"
+style="bottom: 9px; left:5px">
+  <v-icon>mdi-heart</v-icon>
+</v-badge>
+  </v-btn> -->
                 </div>
                 </div>
             </div>
@@ -142,6 +150,11 @@ export default {
         dislikes: post.dislikes + 1,
       });
     },
+    // incrementHearts(post) {
+    //   db.collection('posts').doc(post.id).update({
+    //     hearts: post.hearts + 1,
+    //   });
+    // },
   },
   computed: {
     filteredPosts() {
@@ -237,6 +250,23 @@ p {
   margin-bottom:20px;
   width: 80%;
 }
+/* i.v-icon.notranslate.mdi.mdi-heart.theme--light::before {
+   position:absolute;
+   bottom:-5px;
+   left:-7px;
+   font-size:25px;
+}
+button.heart.v-btn.v-btn--flat.v-btn--icon.v-btn--round.theme--light.v-size--default {
+   position:absolute;
+   top:20px;
+   left:680px;
+   font-size:25px;
+}
+span.v-badge_badge.pink.darken-1{
+   position: absolute;
+   font-family: 'Raleway', sans-serif;
+   font-size:25px;
+} */
 i.v-icon.notranslate.mdi.mdi-thumb-up.theme--light::before {
    position:absolute;
    bottom:-2px;
