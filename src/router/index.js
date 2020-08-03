@@ -17,6 +17,9 @@ const router = new Router({
       path: '/',
       name: 'Blog',
       component: Blog,
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
       path: '/add-post',

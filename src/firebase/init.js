@@ -11,6 +11,16 @@ const firebaseConfig = {
   appId: '1:469484724643:web:0b70b05e36131a949afa16',
   measurementId: 'G-C3D9R1RYC7',
 };
+// const firebaseConfig = {
+//   apiKey: "AIzaSyAuqU6a8xaOXNYBgwQrMfNAClDO0AQaF-k",
+//   authDomain: "pilotcity-blog-website.firebaseapp.com",
+//   databaseURL: "https://pilotcity-blog-website.firebaseio.com",
+//   projectId: "pilotcity-blog-website",
+//   storageBucket: "pilotcity-blog-website.appspot.com",
+//   messagingSenderId: "220310332838",
+//   appId: "1:220310332838:web:fa25b6b3f29322739edb67",
+//   measurementId: "G-ER6YHJP4SW"
+// };
 // Initialize Firebase
 const firebaseApp = firebase.initializeApp(firebaseConfig);
 firebase.analytics();
