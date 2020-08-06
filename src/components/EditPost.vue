@@ -1,6 +1,6 @@
 <template>
     <div v-if="post" class="edit-post container">
-        <h2>Edit {{ post.author }}'s {{ post.subject }} Post</h2>
+        <h2>Edit {{ post.alias }}'s {{ post.subject }} Post</h2>
         <form @submit.prevent="EditPost">
                 <div class="field subject">
                     <label for="subject">Subject:</label>
@@ -68,7 +68,7 @@ export default {
           time: this.post.time,
           message: this.post.message,
           slug: this.post.slug,
-          alias: this.post.alias,
+          alias: this.$route.params.alias,
         }).then(() => {
           this.$router.push({ name: 'Blog' });
         })
