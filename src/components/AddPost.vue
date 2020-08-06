@@ -83,7 +83,16 @@ export default {
           alias: this.$route.params.alias,
           likes: 0,
           dislikes: 0,
-          // hearts: 0,
+          hearts: 0,
+          happyEmojis: 0,
+          frownEmojis: 0,
+          laughEmojis: 0,
+          like_reactions: [],
+          dislike_reactions: [],
+          heart_reactions: [],
+          happyEmoji_reactions: [],
+          frownEmoji_reactions: [],
+          laughEmoji_reactions: [],
         }).then(() => {
           this.$router.push({ name: 'Blog' });
         }).catch((err) => {

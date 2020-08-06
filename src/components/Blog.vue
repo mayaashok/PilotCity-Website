@@ -188,7 +188,7 @@ export default {
       console.log('post.frownEmoji_reactions = ', post.frownEmoji_reactions);
       db.collection('posts').doc(post.id).update({
         frownEmojis: post.frownEmojis + 1,
-        frownEmojis_reactions: post.frownEmoji_reactions,
+        frownEmoji_reactions: post.frownEmoji_reactions,
       });
     },
     incrementLaughEmojis(post) {
@@ -196,7 +196,7 @@ export default {
       console.log('post.laughEmoji_reactions = ', post.laughEmoji_reactions);
       db.collection('posts').doc(post.id).update({
         laughEmojis: post.laughEmojis + 1,
-        laughEmojis_reactions: post.laughEmoji_reactions,
+        laughEmoji_reactions: post.laughEmoji_reactions,
       });
     },
     disableLike(post) {
