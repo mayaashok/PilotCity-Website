@@ -33,7 +33,7 @@
                     <!-- <h4>{{ post.time }}<br>{{ post.date }}</h4> -->
                     <h4>{{ formatTime(post.time) }}<br>{{ formatDate(post.date) }}</h4>
                     <!-- <h4>{{ post.date.toDate().toString()}}</h4> -->
-                    <p>{{ post.message }}</p>
+                    <p style="white-space: pre-wrap;">{{ post.message }}</p>
                     <a href="" class="btn-floating btn-small">
                       <router-link :to="{ name:'EditPost',params:{ post_slug: post.slug }}">
                         <i class="material-icons create">create</i>
@@ -87,8 +87,10 @@ export default {
       const H = +ts.substr(0, 2);
       let h = (H % 12) || 12;
       h = (h < 10) ? (`0${h}`) : h; // leading 0 at the left for 1 digit hours
+      let m = ts.substr(3, 4);
+      m = (m < 10) ? (`0${m}`) : m;
       const ampm = H < 12 ? ' AM' : ' PM';
-      ts = h + ts.substr(2, 3) + ampm;
+      ts = `${h}:${m}${ampm}`;
       return ts;
     },
     formatDate(date) {

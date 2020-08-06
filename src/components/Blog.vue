@@ -32,7 +32,7 @@
                     <!-- <h4>{{ post.time }}<br>{{ post.date }}</h4> -->
                     <h4>{{ formatTime(post.time) }}<br>{{ formatDate(post.date) }}</h4>
                     <!-- <h4>{{ post.date.toDate().toString()}}</h4> -->
-                    <p>{{ post.message }}</p>
+                    <p style="white-space: pre-wrap;">{{ post.message }}</p>
                     <!-- <a href="" class="btn-floating btn-small">
                       <router-link :to="{ name:'EditPost',params:{ post_slug: post.slug }}">
                         <i class="material-icons create">create</i>
@@ -40,36 +40,55 @@
                     </a> -->
                 <!-- <i class="material-icons delete" @click="deletePost(post.id)">delete</i> -->
                 <div id="blog">
-                  <!-- <span class="emoji">&#128077;</span> -->
-  <v-btn class="like" text icon color="blue lighten-2" @click="incrementLikes(post); post.likes++"
+  <v-btn :disabled="disableLike(post)"
+  class="like" text icon color="blue lighten-2"
+  @click="incrementLikes(post); post.likes++"
   style="top: 20px; left:750px">
 <v-badge bottom color="blue darken-1" :content="post.likes" :value="post.likes"
 style="bottom: 5px; left:5px">
   <v-icon>mdi-thumb-up</v-icon>
 </v-badge>
   </v-btn>
-<!--<v-badge color="blue darken-1" :content="likes" :value="likes" style="bottom:
-100px; left:755px">
-</v-badge> -->
-<!-- <button class="reactionButton" v-on:click="emoji++" v-on:dblclick="emoji--"> {{ emoji }}
-</button> -->
-                  <!-- <span class="emoji2"> &#128078;</span> -->
-  <v-btn class="dislike" text icon color="red lighten-2" @click="incrementDislikes(post);
+  <v-btn :disabled="disableDislike(post)" class="dislike"
+  text icon color="red lighten-2" @click="incrementDislikes(post);
 post.dislikes++" style="top: 20px; left:810px">
 <v-badge bottom color="red darken-1" :content="post.dislikes" :value="post.dislikes"
 style="bottom: 5px; left:5px">
   <v-icon>mdi-thumb-down</v-icon>
 </v-badge>
   </v-btn>
-<!-- <button class="reactionButton2" v-on:click="emoji2(1)" v-on:dblclick="emoji2(-1)"> {{ emoji2 }}
-</button> -->
-<!-- <v-btn class="hearts" text icon color="pink lighten-2" @click="incrementHearts(post);
-post.hearts++" style="top: 20px; left:690px">
+<v-btn :disabled="disableHeart(post)"
+class="heart" text icon color="pink lighten-2" @click="incrementHearts(post);
+post.hearts++" style="top: 15px; left:690px">
 <v-badge bottom color="pink darken-1" :content="post.hearts" :value="post.hearts"
-style="bottom: 9px; left:5px">
-  <v-icon>mdi-heart</v-icon>
+style="bottom: 5px; left:4px">
+  <v-icon style="top: 5px; left:-5px">mdi-heart</v-icon>
 </v-badge>
-  </v-btn> -->
+  </v-btn>
+<v-btn :disabled="disableHappyEmoji(post)"
+class="happyEmoji" text icon color="yellow darken-1" @click="incrementHappyEmojis(post);
+post.happyEmojis++" style="top: 45px; left:690px">
+<v-badge bottom color="yellow darken-2" :content="post.happyEmojis" :value="post.happyEmojis"
+style="bottom: 5px; left:4px">
+  <v-icon style="top: 5px; left:-5px">mdi-emoticon</v-icon>
+</v-badge>
+  </v-btn>
+<v-btn :disabled="disableFrownEmoji(post)"
+class="frownEmoji" text icon color="yellow darken-1" @click="incrementFrownEmojis(post);
+post.frownEmojis++" style="top: 45px; left:750px">
+<v-badge bottom color="yellow darken-2" :content="post.frownEmojis" :value="post.frownEmojis"
+style="bottom: 5px; left:4px">
+  <v-icon style="top: 5px; left:-5px">mdi-emoticon-frown</v-icon>
+</v-badge>
+  </v-btn>
+<v-btn :disabled="disableLaughEmoji(post)"
+class="laughEmoji" text icon color="yellow darken-1" @click="incrementLaughEmojis(post);
+post.laughEmojis++" style="top: 45px; left:810px">
+<v-badge bottom color="yellow darken-2" :content="post.laughEmojis" :value="post.laughEmojis"
+style="bottom: 5px; left:4px">
+  <v-icon style="top: 5px; left:-5px">mdi-emoticon-lol</v-icon>
+</v-badge>
+  </v-btn>
                 </div>
                 </div>
             </div>
@@ -84,16 +103,13 @@ style="bottom: 9px; left:5px">
 
 <script>
 import db from '@/firebase/init';
+import firebase from 'firebase';
 
 export default {
   name: 'Blog',
   data() {
     return {
-      // likes: 0,
-      // dislikes: 0,
-      // show: false,
-      // emoji: 0,
-      // emoji2: 0,
+      userId: '',
       posts: [
       ],
       searchTerm: '',
@@ -104,14 +120,6 @@ export default {
     };
   },
   methods: {
-    // // eslint-disable-next-line vue/no-dupe-keys
-    // emoji(amount) {
-    //   this.emoji += amount;
-    // },
-    // // eslint-disable-next-line vue/no-dupe-keys
-    // emoji2(amount) {
-    //   this.emoji2 += amount;
-    // },
     deletePost(id) {
       // delete doc from firestore
       db.collection('posts').doc(id).delete()
@@ -124,8 +132,10 @@ export default {
       const H = +ts.substr(0, 2);
       let h = (H % 12) || 12;
       h = (h < 10) ? (`0${h}`) : h; // leading 0 at the left for 1 digit hours
+      let m = ts.substr(3, 4);
+      m = (m < 10) ? (`0${m}`) : m;
       const ampm = H < 12 ? ' AM' : ' PM';
-      ts = h + ts.substr(2, 3) + ampm;
+      ts = `${h}:${m}${ampm}`;
       return ts;
     },
     formatDate(date) {
@@ -141,20 +151,84 @@ export default {
       return `${month}/${day}/${year}`;
     },
     incrementLikes(post) {
+      post.like_reactions.push(this.userId);
+      console.log('post.like_reactions = ', post.like_reactions);
       db.collection('posts').doc(post.id).update({
         likes: post.likes + 1,
+        like_reactions: post.like_reactions,
       });
+      this.disableLike(post);
     },
     incrementDislikes(post) {
+      post.dislike_reactions.push(this.userId);
+      console.log('post.dislike_reactions = ', post.dislike_reactions);
       db.collection('posts').doc(post.id).update({
         dislikes: post.dislikes + 1,
+        dislike_reactions: post.dislike_reactions,
       });
     },
-    // incrementHearts(post) {
-    //   db.collection('posts').doc(post.id).update({
-    //     hearts: post.hearts + 1,
-    //   });
-    // },
+    incrementHearts(post) {
+      post.heart_reactions.push(this.userId);
+      console.log('post.heart_reactions = ', post.heart_reactions);
+      db.collection('posts').doc(post.id).update({
+        hearts: post.hearts + 1,
+        heart_reactions: post.heart_reactions,
+      });
+    },
+    incrementHappyEmojis(post) {
+      post.happyEmoji_reactions.push(this.userId);
+      console.log('post.happyEmoji_reactions = ', post.happyEmoji_reactions);
+      db.collection('posts').doc(post.id).update({
+        happyEmojis: post.happyEmojis + 1,
+        happyEmoji_reactions: post.happyEmoji_reactions,
+      });
+    },
+    incrementFrownEmojis(post) {
+      post.frownEmoji_reactions.push(this.userId);
+      console.log('post.frownEmoji_reactions = ', post.frownEmoji_reactions);
+      db.collection('posts').doc(post.id).update({
+        frownEmojis: post.frownEmojis + 1,
+        frownEmojis_reactions: post.frownEmoji_reactions,
+      });
+    },
+    incrementLaughEmojis(post) {
+      post.laughEmoji_reactions.push(this.userId);
+      console.log('post.laughEmoji_reactions = ', post.laughEmoji_reactions);
+      db.collection('posts').doc(post.id).update({
+        laughEmojis: post.laughEmojis + 1,
+        laughEmojis_reactions: post.laughEmoji_reactions,
+      });
+    },
+    disableLike(post) {
+      const boolLike = post.like_reactions.includes(this.userId);
+      console.log('blog.vue disableLike boolLike =', boolLike);
+      return boolLike;
+    },
+    disableDislike(post) {
+      const boolDislike = post.dislike_reactions.includes(this.userId);
+      console.log('blog.vue disableDislike boolDislike =', boolDislike);
+      return boolDislike;
+    },
+    disableHeart(post) {
+      const boolHeart = post.heart_reactions.includes(this.userId);
+      console.log('blog.vue disableHeart boolHeart =', boolHeart);
+      return boolHeart;
+    },
+    disableHappyEmoji(post) {
+      const boolHappyEmoji = post.happyEmoji_reactions.includes(this.userId);
+      console.log('blog.vue disableHappyEmoji boolHappyEmoji =', boolHappyEmoji);
+      return boolHappyEmoji;
+    },
+    disableFrownEmoji(post) {
+      const boolFrownEmoji = post.frownEmoji_reactions.includes(this.userId);
+      console.log('blog.vue disableFrownEmoji boolFrownEmoji =', boolFrownEmoji);
+      return boolFrownEmoji;
+    },
+    disableLaughEmoji(post) {
+      const boolLaughEmoji = post.laughEmoji_reactions.includes(this.userId);
+      console.log('blog.vue disableLaughEmoji boolLaughEmoji =', boolLaughEmoji);
+      return boolLaughEmoji;
+    },
   },
   computed: {
     filteredPosts() {
@@ -179,6 +253,8 @@ export default {
           post.id = doc.id;
           console.log(post);
           this.posts.push(post);
+          this.userId = firebase.auth().currentUser.uid;
+          console.log('Blog.vue userId =', this.userId);
         });
       });
   },
@@ -186,6 +262,10 @@ export default {
 </script>
 
 <style>
+element.style {
+  bottom: 5px;
+  left: 0px;
+}
 .blog h1{
   text-align: center;
   color: rgba(79, 79, 79, 0.86);

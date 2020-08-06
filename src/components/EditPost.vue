@@ -20,7 +20,8 @@
                 </div> -->
                 <div class="field message">
                     <label for="message">Message:</label>
-                    <v-textarea type="text" name="message" v-model="post.message" color="teal">
+                    <v-textarea type="text" name="message" v-model="post.message" color="teal"
+                    auto-grow style="white-space: pre-wrap;">
                       </v-textarea>
                 </div>
                 <br/>
