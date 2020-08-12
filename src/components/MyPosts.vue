@@ -30,8 +30,8 @@
             <div class="card" v-for="post in filteredPosts" :key="post.id">
                 <div class="card-content">
                     <h3><br>{{ post.alias }}: {{ post.subject }}</h3>
-                    <!-- <h4>{{ post.time }}<br>{{ post.date }}</h4> -->
-                    <h4>{{ formatTime(post.time) }}<br>{{ formatDate(post.date) }}</h4>
+                    <h4>{{ post.time }}<br>{{ post.date }}</h4>
+                    <!-- <h4>{{ formatTime(post.time) }}<br>{{ formatDate(post.date) }}</h4> -->
                     <!-- <h4>{{ post.date.toDate().toString()}}</h4> -->
                     <p style="white-space: pre-wrap;">{{ post.message }}</p>
                     <a href="" class="btn-floating btn-small">
@@ -82,41 +82,15 @@ export default {
           });
       }
     },
-    formatTime(time24) {
-      let ts = time24;
-      const H = +ts.substr(0, 2);
-      let h = (H % 12) || 12;
-      h = (h < 10) ? (`0${h}`) : h; // leading 0 at the left for 1 digit hours
-      let m = ts.substr(3, 4);
-      m = (m < 10) ? (`0${m}`) : m;
-      const ampm = H < 12 ? ' AM' : ' PM';
-      ts = `${h}:${m}${ampm}`;
-      return ts;
-    },
-    formatDate(date) {
-      console.log('date', date);
-      const splitDate = date.split('-');
-      if (splitDate.count === 0) {
-        return date;
-      }
-      const year = splitDate[0];
-      const month = splitDate[1];
-      const day = splitDate[2];
-
-      return `${month}/${day}/${year}`;
-    },
   },
   computed: {
     filteredPosts() {
-      console.log('search term: ', this.searchTerm);
-      console.log('this: ', this);
       const newSearchTerm = (this.searchTerm) ? this.searchTerm.toLowerCase() : this.searchTerm;
-      console.log('New Search Term:', newSearchTerm);
       return this.myPosts.filter((post) => post.message.toLowerCase().match(newSearchTerm)
-        || this.formatDate(post.date).match(this.searchTerm)
+        || post.date.match(this.searchTerm)
         || post.subject.toLowerCase().match(newSearchTerm)
         || post.alias.toLowerCase().match(newSearchTerm)
-        || this.formatTime(post.time).match(this.searchTerm));
+        || post.time.match(this.searchTerm));
     },
   },
   created() {
@@ -126,10 +100,7 @@ export default {
         snapshot.forEach((doc) => {
           const post = doc.data();
           post.id = doc.id;
-          console.log('In myPosts page', post);
           const userId = firebase.auth().currentUser.uid;
-          console.log('userId', userId);
-          console.log('post userId', post.user_id);
           if (post.user_id.match(userId)) {
             this.myPosts.push(post);
           }
@@ -141,14 +112,10 @@ export default {
     //     snapshot.forEach((doc) => {
     //       const post = doc.data();
     //       post.id = doc.id;
-    //       console.log('myPosts', post);
     //       this.myPosts.push(post);
     //   this.user = doc.data();
     //   this.user.id = doc.id;
     // });
-    // console.log('get current user id');
-    // console.log(this.user.id);
-    // console.log(this.user.alias);
     // this.alias = this.user.alias;
     //   });
   },

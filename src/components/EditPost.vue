@@ -6,18 +6,6 @@
                     <label for="subject">Subject:</label>
                     <input type="text" name="subject" v-model="post.subject">
                 </div>
-                <!-- <div class="field author">
-                    <label for="author">Author:</label>
-                    <input type="text" name="author" v-model="post.author">
-                </div> -->
-                <!-- <div class="field date">
-                    <label for="date">Date:</label>
-                    <input type="date" name="date" v-model="post.date">
-                </div>
-                <div class="field time">
-                    <label for="time">Time:</label>
-                    <input type="time" name="time" v-model="post.time">
-                </div> -->
                 <div class="field message">
                     <label for="message">Message:</label>
                     <v-textarea type="text" name="message" v-model="post.message" color="teal"
@@ -40,6 +28,7 @@
 <script>
 import db from '@/firebase/init';
 import slugify from 'slugify';
+import moment from 'moment';
 
 export default {
   name: 'EditPost',
@@ -53,8 +42,10 @@ export default {
       if (this.post.subject) {
         this.feedback = null;
         const today = new Date();
-        this.post.date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
-        this.post.time = `${today.getHours()}:${today.getMinutes()}`;
+        const dateFormat = 'MM/DD/YYYY';
+        const timeFormat = 'hh:mm a';
+        this.post.date = moment(today).format(dateFormat);
+        this.post.time = moment(today).format(timeFormat);
         // create a slug
         this.post.slug = slugify(this.post.subject, {
           replacement: '-',
@@ -68,7 +59,7 @@ export default {
           time: this.post.time,
           message: this.post.message,
           slug: this.post.slug,
-          alias: this.$route.params.alias,
+          alias: this.post.alias,
         }).then(() => {
           this.$router.push({ name: 'Blog' });
         })

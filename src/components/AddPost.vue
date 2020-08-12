@@ -6,18 +6,6 @@
                     <label for="subject">Subject:</label>
                     <input type="text" name="subject" v-model="subject">
                 </div>
-                <!-- <div class="field author">
-                    <label for="author">Author:</label>
-                    <input type="text" name="author" v-model="author">
-                </div> -->
-                <!-- <div class="field date">
-                    <label for="date">Date:</label>
-                    <input type="date" name="date" v-model="date">
-                </div>
-                <div class="field time">
-                    <label for="time">Time:</label>
-                    <input type="time" name="time" v-model="time">
-                </div> -->
                 <div class="field message">
                     <label for="message">Message:</label>
                       <v-textarea type="text" name="message" v-model="message"
@@ -41,13 +29,13 @@
 import db from '@/firebase/init';
 import slugify from 'slugify';
 import firebase from 'firebase';
+import moment from 'moment';
 
 export default {
   name: 'AddPost',
   data() {
     return {
       subject: null,
-      // author: null,
       date: null,
       time: null,
       message: null,
@@ -59,22 +47,21 @@ export default {
   },
   methods: {
     AddPost() {
-      console.log('where is this: addpost page', this.$route.params.alias);
       if (this.subject) {
         this.feedback = null;
         const today = new Date();
-        this.date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
-        this.time = `${today.getHours()}:${today.getMinutes()}`;
+        const dateFormat = 'MM/DD/YYYY';
+        const timeFormat = 'hh:mm a';
+        this.date = moment(today).format(dateFormat);
+        this.time = moment(today).format(timeFormat);
         // create a slug
         this.slug = slugify(this.subject, {
           replacement: '-',
           remove: /[$*_+~.()'"!\-:@]/g,
           lower: true,
         });
-        console.log('setting post field: ', this.$route.params.alias);
         db.collection('posts').add({
           subject: this.subject,
-          // author: this.author,
           date: this.date,
           time: this.time,
           message: this.message,

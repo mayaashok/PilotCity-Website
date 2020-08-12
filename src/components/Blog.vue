@@ -29,9 +29,7 @@
             <div class="card" v-for="post in filteredPosts" :key="post.id">
                 <div class="card-content">
                     <h3><br>{{ post.alias }}: {{ post.subject }}</h3>
-                    <!-- <h4>{{ post.time }}<br>{{ post.date }}</h4> -->
-                    <h4>{{ formatTime(post.time) }}<br>{{ formatDate(post.date) }}</h4>
-                    <!-- <h4>{{ post.date.toDate().toString()}}</h4> -->
+                    <h4>{{ post.time }}<br>{{ post.date }}</h4>
                     <p style="white-space: pre-wrap;">{{ post.message }}</p>
                     <!-- <a href="" class="btn-floating btn-small">
                       <router-link :to="{ name:'EditPost',params:{ post_slug: post.slug }}">
@@ -40,53 +38,38 @@
                     </a> -->
                 <!-- <i class="material-icons delete" @click="deletePost(post.id)">delete</i> -->
                 <div id="blog">
-  <v-btn :disabled="disableLike(post)"
-  class="like" text icon color="blue lighten-2"
-  @click="incrementLikes(post); post.likes++"
-  style="top: 20px; left:750px">
-<v-badge bottom color="blue darken-1" :content="post.likes" :value="post.likes"
-style="bottom: 5px; left:5px">
-  <v-icon>mdi-thumb-up</v-icon>
+  <v-btn class="like" text icon @click="updateLikes(post);">
+<v-badge bottom color="blue darken-1" :content="post.likes" :value="post.likes">
+  <v-icon class="likeIcon" :id="'likeButtonChange' + post.id" :color="getLikeColor(post)">
+    mdi-thumb-up</v-icon>
 </v-badge>
   </v-btn>
-  <v-btn :disabled="disableDislike(post)" class="dislike"
-  text icon color="red lighten-2" @click="incrementDislikes(post);
-post.dislikes++" style="top: 20px; left:810px">
-<v-badge bottom color="red darken-1" :content="post.dislikes" :value="post.dislikes"
-style="bottom: 5px; left:5px">
-  <v-icon>mdi-thumb-down</v-icon>
+  <v-btn class="dislike" text icon @click="updateDislikes(post);">
+<v-badge bottom color="red darken-1" :content="post.dislikes" :value="post.dislikes">
+<v-icon :id="'dislikeButtonChange' + post.id" :color="getDislikeColor(post)">mdi-thumb-down</v-icon>
 </v-badge>
   </v-btn>
-<v-btn :disabled="disableHeart(post)"
-class="heart" text icon color="pink lighten-2" @click="incrementHearts(post);
-post.hearts++" style="top: 15px; left:690px">
-<v-badge bottom color="pink darken-1" :content="post.hearts" :value="post.hearts"
-style="bottom: 5px; left:4px">
-  <v-icon style="top: 5px; left:-5px">mdi-heart</v-icon>
+<v-btn class="heart" text icon @click="updateHearts(post);">
+<v-badge bottom color="pink darken-1" :content="post.hearts" :value="post.hearts">
+  <v-icon :id="'heartButtonChange' + post.id" :color="getHeartColor(post)">mdi-heart</v-icon>
 </v-badge>
   </v-btn>
-<v-btn :disabled="disableHappyEmoji(post)"
-class="happyEmoji" text icon color="yellow darken-1" @click="incrementHappyEmojis(post);
-post.happyEmojis++" style="top: 45px; left:690px">
-<v-badge bottom color="yellow darken-2" :content="post.happyEmojis" :value="post.happyEmojis"
-style="bottom: 5px; left:4px">
-  <v-icon style="top: 5px; left:-5px">mdi-emoticon</v-icon>
+<v-btn class="happyEmoji" text icon @click="updateHappyEmojis(post);">
+<v-badge bottom color="yellow darken-2" :content="post.happyEmojis"
+:value="post.happyEmojis">
+  <v-icon :id="'happyButtonChange' + post.id" :color="getHappyColor(post)">mdi-emoticon</v-icon>
 </v-badge>
   </v-btn>
-<v-btn :disabled="disableFrownEmoji(post)"
-class="frownEmoji" text icon color="yellow darken-1" @click="incrementFrownEmojis(post);
-post.frownEmojis++" style="top: 45px; left:750px">
-<v-badge bottom color="yellow darken-2" :content="post.frownEmojis" :value="post.frownEmojis"
-style="bottom: 5px; left:4px">
-  <v-icon style="top: 5px; left:-5px">mdi-emoticon-frown</v-icon>
+<v-btn class="frownEmoji" text icon @click="updateFrownEmojis(post);">
+<v-badge bottom color="yellow darken-2" :content="post.frownEmojis"
+:value="post.frownEmojis">
+<v-icon :id="'frownButtonChange' + post.id" :color="getFrownColor(post)">mdi-emoticon-frown</v-icon>
 </v-badge>
   </v-btn>
-<v-btn :disabled="disableLaughEmoji(post)"
-class="laughEmoji" text icon color="yellow darken-1" @click="incrementLaughEmojis(post);
-post.laughEmojis++" style="top: 45px; left:810px">
-<v-badge bottom color="yellow darken-2" :content="post.laughEmojis" :value="post.laughEmojis"
-style="bottom: 5px; left:4px">
-  <v-icon style="top: 5px; left:-5px">mdi-emoticon-lol</v-icon>
+<v-btn class="laughEmoji" text icon @click="updateLaughEmojis(post);">
+<v-badge bottom color="yellow darken-2" :content="post.laughEmojis"
+:value="post.laughEmojis">
+  <v-icon :id="'laughButtonChange' + post.id" :color="getLaughColor(post)">mdi-emoticon-lol</v-icon>
 </v-badge>
   </v-btn>
                 </div>
@@ -127,120 +110,219 @@ export default {
           this.posts = this.posts.filter((post) => post.id !== id);
         });
     },
-    formatTime(time24) {
-      let ts = time24;
-      const H = +ts.substr(0, 2);
-      let h = (H % 12) || 12;
-      h = (h < 10) ? (`0${h}`) : h; // leading 0 at the left for 1 digit hours
-      let m = ts.substr(3, 4);
-      m = (m < 10) ? (`0${m}`) : m;
-      const ampm = H < 12 ? ' AM' : ' PM';
-      ts = `${h}:${m}${ampm}`;
-      return ts;
-    },
-    formatDate(date) {
-      console.log('date', date);
-      const splitDate = date.split('-');
-      if (splitDate.count === 0) {
-        return date;
-      }
-      const year = splitDate[0];
-      const month = splitDate[1];
-      const day = splitDate[2];
-
-      return `${month}/${day}/${year}`;
-    },
-    incrementLikes(post) {
-      post.like_reactions.push(this.userId);
-      console.log('post.like_reactions = ', post.like_reactions);
-      db.collection('posts').doc(post.id).update({
-        likes: post.likes + 1,
-        like_reactions: post.like_reactions,
-      });
-      this.disableLike(post);
-    },
-    incrementDislikes(post) {
-      post.dislike_reactions.push(this.userId);
-      console.log('post.dislike_reactions = ', post.dislike_reactions);
-      db.collection('posts').doc(post.id).update({
-        dislikes: post.dislikes + 1,
-        dislike_reactions: post.dislike_reactions,
-      });
-    },
-    incrementHearts(post) {
-      post.heart_reactions.push(this.userId);
-      console.log('post.heart_reactions = ', post.heart_reactions);
-      db.collection('posts').doc(post.id).update({
-        hearts: post.hearts + 1,
-        heart_reactions: post.heart_reactions,
-      });
-    },
-    incrementHappyEmojis(post) {
-      post.happyEmoji_reactions.push(this.userId);
-      console.log('post.happyEmoji_reactions = ', post.happyEmoji_reactions);
-      db.collection('posts').doc(post.id).update({
-        happyEmojis: post.happyEmojis + 1,
-        happyEmoji_reactions: post.happyEmoji_reactions,
-      });
-    },
-    incrementFrownEmojis(post) {
-      post.frownEmoji_reactions.push(this.userId);
-      console.log('post.frownEmoji_reactions = ', post.frownEmoji_reactions);
-      db.collection('posts').doc(post.id).update({
-        frownEmojis: post.frownEmojis + 1,
-        frownEmoji_reactions: post.frownEmoji_reactions,
-      });
-    },
-    incrementLaughEmojis(post) {
-      post.laughEmoji_reactions.push(this.userId);
-      console.log('post.laughEmoji_reactions = ', post.laughEmoji_reactions);
-      db.collection('posts').doc(post.id).update({
-        laughEmojis: post.laughEmojis + 1,
-        laughEmoji_reactions: post.laughEmoji_reactions,
-      });
-    },
-    disableLike(post) {
+    updateLikes(post) {
       const boolLike = post.like_reactions.includes(this.userId);
-      console.log('blog.vue disableLike boolLike =', boolLike);
-      return boolLike;
+      if (boolLike) {
+        const index = post.like_reactions.indexOf(this.userId);
+        post.like_reactions.splice(index, 1);
+        // eslint-disable-next-line no-param-reassign
+        post.likes -= 1;
+        db.collection('posts').doc(post.id).update({
+          likes: post.likes,
+          like_reactions: post.like_reactions,
+        });
+        document.getElementById(`likeButtonChange${post.id}`).style.color = '#64B5F6';
+      } else {
+        post.like_reactions.push(this.userId);
+        // eslint-disable-next-line no-param-reassign
+        post.likes += 1;
+        db.collection('posts').doc(post.id).update({
+          likes: post.likes,
+          like_reactions: post.like_reactions,
+        });
+        document.getElementById(`likeButtonChange${post.id}`).style.color = '#BBDEFB';
+      }
     },
-    disableDislike(post) {
+    getLikeColor(post) {
+      const boolLike = post.like_reactions.includes(this.userId);
+      if (boolLike) {
+        return '#BBDEFB';
+      }
+      return '#64B5F6';
+    },
+    updateDislikes(post) {
       const boolDislike = post.dislike_reactions.includes(this.userId);
-      console.log('blog.vue disableDislike boolDislike =', boolDislike);
-      return boolDislike;
+      if (boolDislike) {
+        const index = post.dislike_reactions.indexOf(this.userId);
+        post.dislike_reactions.splice(index, 1);
+        // eslint-disable-next-line no-param-reassign
+        post.dislikes -= 1;
+        db.collection('posts').doc(post.id).update({
+          dislikes: post.dislikes,
+          dislike_reactions: post.dislike_reactions,
+        });
+        document.getElementById(`dislikeButtonChange${post.id}`).style.color = '#E57373';
+      } else {
+        post.dislike_reactions.push(this.userId);
+        // eslint-disable-next-line no-param-reassign
+        post.dislikes += 1;
+        db.collection('posts').doc(post.id).update({
+          dislikes: post.dislikes,
+          dislike_reactions: post.dislike_reactions,
+        });
+        document.getElementById(`dislikeButtonChange${post.id}`).style.color = '#f7adad';
+      }
     },
-    disableHeart(post) {
+    getDislikeColor(post) {
+      const boolDislike = post.dislike_reactions.includes(this.userId);
+      if (boolDislike) {
+        return '#f7adad';
+      }
+      return '#E57373';
+    },
+    updateHearts(post) {
       const boolHeart = post.heart_reactions.includes(this.userId);
-      console.log('blog.vue disableHeart boolHeart =', boolHeart);
-      return boolHeart;
+      if (boolHeart) {
+        const index = post.heart_reactions.indexOf(this.userId);
+        post.heart_reactions.splice(index, 1);
+        // eslint-disable-next-line no-param-reassign
+        post.hearts -= 1;
+        db.collection('posts').doc(post.id).update({
+          hearts: post.hearts,
+          heart_reactions: post.heart_reactions,
+        });
+        document.getElementById(`heartButtonChange${post.id}`).style.color = '#F06292';
+      } else {
+        post.heart_reactions.push(this.userId);
+        // eslint-disable-next-line no-param-reassign
+        post.hearts += 1;
+        db.collection('posts').doc(post.id).update({
+          hearts: post.hearts,
+          heart_reactions: post.heart_reactions,
+        });
+        document.getElementById(`heartButtonChange${post.id}`).style.color = '#F8BBD0';
+      }
     },
-    disableHappyEmoji(post) {
+    getHeartColor(post) {
+      const boolHeart = post.heart_reactions.includes(this.userId);
+      if (boolHeart) {
+        return '#F8BBD0';
+      }
+      return '#F06292';
+    },
+    updateHappyEmojis(post) {
       const boolHappyEmoji = post.happyEmoji_reactions.includes(this.userId);
-      console.log('blog.vue disableHappyEmoji boolHappyEmoji =', boolHappyEmoji);
-      return boolHappyEmoji;
+      if (boolHappyEmoji) {
+        const index = post.happyEmoji_reactions.indexOf(this.userId);
+        post.happyEmoji_reactions.splice(index, 1);
+        // eslint-disable-next-line no-param-reassign
+        post.happyEmojis -= 1;
+        db.collection('posts').doc(post.id).update({
+          happyEmojis: post.happyEmojis,
+          happyEmoji_reactions: post.happyEmoji_reactions,
+        });
+        document.getElementById(`happyButtonChange${post.id}`).style.color = '#FDD835';
+      } else {
+        post.happyEmoji_reactions.push(this.userId);
+        // eslint-disable-next-line no-param-reassign
+        post.happyEmojis += 1;
+        db.collection('posts').doc(post.id).update({
+          happyEmojis: post.happyEmojis,
+          happyEmoji_reactions: post.happyEmoji_reactions,
+        });
+        document.getElementById(`happyButtonChange${post.id}`).style.color = '#FFECB3';
+      }
     },
-    disableFrownEmoji(post) {
+    getHappyColor(post) {
+      const boolHappyEmoji = post.happyEmoji_reactions.includes(this.userId);
+      if (boolHappyEmoji) {
+        return '#FFECB3';
+      }
+      return '#FDD835';
+    },
+    updateFrownEmojis(post) {
       const boolFrownEmoji = post.frownEmoji_reactions.includes(this.userId);
-      console.log('blog.vue disableFrownEmoji boolFrownEmoji =', boolFrownEmoji);
-      return boolFrownEmoji;
+      if (boolFrownEmoji) {
+        const index = post.frownEmoji_reactions.indexOf(this.userId);
+        post.frownEmoji_reactions.splice(index, 1);
+        // eslint-disable-next-line no-param-reassign
+        post.frownEmojis -= 1;
+        db.collection('posts').doc(post.id).update({
+          frownEmojis: post.frownEmojis,
+          frownEmoji_reactions: post.frownEmoji_reactions,
+        });
+        document.getElementById(`frownButtonChange${post.id}`).style.color = '#FDD835';
+      } else {
+        post.frownEmoji_reactions.push(this.userId);
+        // eslint-disable-next-line no-param-reassign
+        post.frownEmojis += 1;
+        db.collection('posts').doc(post.id).update({
+          frownEmojis: post.frownEmojis,
+          frownEmoji_reactions: post.frownEmoji_reactions,
+        });
+        document.getElementById(`frownButtonChange${post.id}`).style.color = '#FFECB3';
+      }
     },
-    disableLaughEmoji(post) {
+    getFrownColor(post) {
+      const boolFrownEmoji = post.frownEmoji_reactions.includes(this.userId);
+      if (boolFrownEmoji) {
+        return '#FFECB3';
+      }
+      return '#FDD835';
+    },
+    updateLaughEmojis(post) {
       const boolLaughEmoji = post.laughEmoji_reactions.includes(this.userId);
-      console.log('blog.vue disableLaughEmoji boolLaughEmoji =', boolLaughEmoji);
-      return boolLaughEmoji;
+      if (boolLaughEmoji) {
+        const index = post.laughEmoji_reactions.indexOf(this.userId);
+        post.laughEmoji_reactions.splice(index, 1);
+        // eslint-disable-next-line no-param-reassign
+        post.laughEmojis -= 1;
+        db.collection('posts').doc(post.id).update({
+          laughEmojis: post.laughEmojis,
+          laughEmoji_reactions: post.laughEmoji_reactions,
+        });
+        document.getElementById(`laughButtonChange${post.id}`).style.color = '#FDD835';
+      } else {
+        post.laughEmoji_reactions.push(this.userId);
+        // eslint-disable-next-line no-param-reassign
+        post.laughEmojis += 1;
+        db.collection('posts').doc(post.id).update({
+          laughEmojis: post.laughEmojis,
+          laughEmoji_reactions: post.laughEmoji_reactions,
+        });
+        document.getElementById(`laughButtonChange${post.id}`).style.color = '#FFECB3';
+      }
     },
+    getLaughColor(post) {
+      const boolLaughEmoji = post.laughEmoji_reactions.includes(this.userId);
+      if (boolLaughEmoji) {
+        return '#FFECB3';
+      }
+      return '#FDD835';
+    },
+    // disableLike(post) {
+    //   const boolLike = post.like_reactions.includes(this.userId);
+    //   return boolLike;
+    // },
+    // disableDislike(post) {
+    //   const boolDislike = post.dislike_reactions.includes(this.userId);
+    //   return boolDislike;
+    // },
+    // disableHeart(post) {
+    //   const boolHeart = post.heart_reactions.includes(this.userId);
+    //   return boolHeart;
+    // },
+    // disableHappyEmoji(post) {
+    //   const boolHappyEmoji = post.happyEmoji_reactions.includes(this.userId);
+    //   return boolHappyEmoji;
+    // },
+    // disableFrownEmoji(post) {
+    //   const boolFrownEmoji = post.frownEmoji_reactions.includes(this.userId);
+    //   return boolFrownEmoji;
+    // },
+    // disableLaughEmoji(post) {
+    //   const boolLaughEmoji = post.laughEmoji_reactions.includes(this.userId);
+    //   return boolLaughEmoji;
+    // },
   },
   computed: {
     filteredPosts() {
-      console.log('search term: ', this.searchTerm);
-      console.log('this: ', this);
       const newSearchTerm = (this.searchTerm) ? this.searchTerm.toLowerCase() : this.searchTerm;
-      console.log('New Search Term:', newSearchTerm);
       return this.posts.filter((post) => post.message.toLowerCase().match(newSearchTerm)
-        || this.formatDate(post.date).match(this.searchTerm)
+        || post.date.match(this.searchTerm)
         || post.subject.toLowerCase().match(newSearchTerm)
         || post.alias.toLowerCase().match(newSearchTerm)
-        || this.formatTime(post.time).match(this.searchTerm));
+        || post.time.match(this.searchTerm));
     },
   },
   created() {
@@ -251,10 +333,8 @@ export default {
         snapshot.forEach((doc) => {
           const post = doc.data();
           post.id = doc.id;
-          console.log(post);
           this.posts.push(post);
           this.userId = firebase.auth().currentUser.uid;
-          console.log('Blog.vue userId =', this.userId);
         });
       });
   },
@@ -262,10 +342,6 @@ export default {
 </script>
 
 <style>
-element.style {
-  bottom: 5px;
-  left: 0px;
-}
 .blog h1{
   text-align: center;
   color: rgba(79, 79, 79, 0.86);
@@ -330,23 +406,6 @@ p {
   margin-bottom:20px;
   width: 80%;
 }
-/* i.v-icon.notranslate.mdi.mdi-heart.theme--light::before {
-   position:absolute;
-   bottom:-5px;
-   left:-7px;
-   font-size:25px;
-}
-button.heart.v-btn.v-btn--flat.v-btn--icon.v-btn--round.theme--light.v-size--default {
-   position:absolute;
-   top:20px;
-   left:680px;
-   font-size:25px;
-}
-span.v-badge_badge.pink.darken-1{
-   position: absolute;
-   font-family: 'Raleway', sans-serif;
-   font-size:25px;
-} */
 i.v-icon.notranslate.mdi.mdi-thumb-up.theme--light::before {
    position:absolute;
    bottom:-2px;
@@ -384,64 +443,6 @@ span.v-badge_badge.red.darken-1{
    font-family: 'Raleway', sans-serif;
    font-size:25px;
 }
-/* .emoji{
-   position:absolute;
-   bottom:30px;
-   right:55px;
-   font-size:25px;
-}
-.emoji2{
-  position:absolute;
-  bottom:30px;
-  right:10px;
-  font-size:25px;
-}
-.reactionButton{
-   position:absolute;
-   bottom:10px;
-   right:55px;
-   font-size:20px;
-   color:black;
-}
-.reactionButton2{
-   position:absolute;
-   bottom:10px;
-   right:10px;
-   font-size:20px;
-   color:black;
-} */
-/* .emojiBackground{
-background-color:#eeeeee;
-font-weight:bold;
-color:black;
-border:thin Black;
-border-style:dashed;
-line-height:20px;
-position:absolute;
-} */
-/* .btn-floating {
-    background-color: #C4C4C4;
-} */
-/* .btn {
-   position: absolute;
-   background-color: #C4C4C4;
-   bottom: 200px;
-   right: 200px;
-   cursor: pointer;
-} */
-/* .btn {
-   position: relative;
-   background-color: #C4C4C4;
-   top: 100px;
-   cursor: pointer;
-} */
-/* .btn .create {
-    background-color: #C4C4C4;
-    cursor: pointer;
-    position: absolute;
-    top: 4px;
-    right: 4px;
-} */
 .btn-small {
   background-color: #C4C4C4;
   position: absolute;
@@ -449,23 +450,6 @@ position:absolute;
   right: 20px;
   cursor: pointer;
 }
-/* button.v-icon.notranslate.material-icons.delete.v-icon--link.mdi.mdi-delete.theme--light::before{
-  position: absolute;
-  top: 19px;
-  right: 65px;
-  bottom: 171px;
-  left: 830px;
-  cursor: pointer;
-  color: #C4C4C4;
-  font-size: 1.6em;
-}
-button.v-icon.notranslate.material-icons.delete.v-icon--link.mdi.mdi-delete.theme--light::after{
-  position: absolute;
-  top: -171px;
-  right: -830px;
-  cursor: pointer;
-  font-size: 1.6em;
-} */
 i.material-icons.delete{
   position: absolute;
   top: 19px;
@@ -549,5 +533,57 @@ input.placeholder {
 button, input.searchbar, optgroup, select, textarea {
     font-family: Raleway;
     color: #e4e4e4;
+}
+i.v-icon.notranslate.mdi.mdi-emoticon-lol.theme--light::before {
+  bottom: 5px !important;
+  left: -3px !important;
+}
+i.v-icon.notranslate.mdi.mdi-emoticon-frown.theme--light::before {
+  bottom: 5px !important;
+  left: -3px !important;
+}
+i.v-icon.notranslate.mdi.mdi-emoticon.theme--light::before {
+  bottom: 5px !important;
+  left: -3px !important;
+}
+i.v-icon.notranslate.mdi.mdi-heart.theme--light::before {
+  bottom: 20px !important;
+  left: -5px !important;
+}
+i.v-icon.notranslate.mdi.mdi-thumb-down.theme--light::before {
+  bottom: 0px !important;
+  left: -1px !important;
+}
+i.v-icon.notranslate.mdi.mdi-thumb-up.theme--light::before {
+  bottom: 0px !important;
+  left: -1px !important;
+}
+.v-badge__wrapper {
+  height: 70% !important;
+  width: 109% !important;
+}
+button.laughEmoji.v-btn.v-btn--flat.v-btn--icon.v-btn--round.theme--light.v-size--default {
+  top: 45px;
+  left: 810px;
+}
+button.frownEmoji.v-btn.v-btn--flat.v-btn--icon.v-btn--round.theme--light.v-size--default {
+  top: 45px;
+  left: 750px;
+}
+button.happyEmoji.v-btn.v-btn--flat.v-btn--icon.v-btn--round.theme--light.v-size--default {
+  top: 45px;
+  left: 690px;
+}
+button.heart.v-btn.v-btn--flat.v-btn--icon.v-btn--round.theme--light.v-size--default {
+  top:  15px;
+  left: 688px;
+}
+button.dislike.v-btn.v-btn--flat.v-btn--icon.v-btn--round.theme--light.v-size--default {
+  top:  15px !important;
+  left: 810px !important;
+}
+button.like.v-btn.v-btn--flat.v-btn--icon.v-btn--round.theme--light.v-size--default  {
+  top:  15px !important;
+  left: 750px;
 }
 </style>
